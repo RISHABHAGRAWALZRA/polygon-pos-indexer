@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - 2181:2181
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    ports:
+      - 9092:9092
+    volumes:
+      - ./data/kafka:/var/run/docker.sock
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    depends_on:
+      - zookeeper
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/mongo:/data/db
+  fetcher:
+    container_name: fetcher
+    build: ./microservices/chain-data-fetcher
+    ports:
+      - 3000:3000
+    volumes:
+      - ./microservices/chain-data-fetcher:/app
+    environment:
+      - PORT=3000
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=transaction
+    depends_on:
+      - kafka
+  filterer:
+    container_name: filterer
+    build: ./microservices/chain-data-fetcher
+    ports:
+      - 5000:5000
+    volumes:
+      - ./microservices/chain-data-filterer:/app
+    environment:
+      - PORT=5000
+      - MONGO_URL=mongodb://mongo:27017/polygon-pos-indexer
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC=transaction
+    depends_on:
+      - kafka
+      - mongo
