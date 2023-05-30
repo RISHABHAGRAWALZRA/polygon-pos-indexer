@@ -52,3 +52,15 @@ services:
     depends_on:
       - kafka
       - mongo
+  provider:
+    container_name: provider
+    build: ./microservices/chain-data-provider
+    ports:
+      - 7000:7000
+    volumes:
+      - ./microservices/chain-data-provider:/app
+    environment:
+      - PORT=7000
+      - MONGO_URL=mongodb://mongo:27017/polygon-pos-indexer
+    depends_on:
+      - mongo

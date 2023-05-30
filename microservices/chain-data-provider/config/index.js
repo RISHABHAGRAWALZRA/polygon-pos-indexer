@@ -11,9 +11,8 @@ module.exports = {
       useUnifiedTopology: true,
     },
   },
-  GET_BLOCK_RPC_NODE_URL: 'wss://matic.getblock.io/' + process.env.GET_BLOCK_API_KEY + '/mainnet/',
   NODE_ENV: process.env.NODE_ENV || 'production',
-  PORT: process.env.PORT || 5000,
+  PORT: process.env.PORT || 7000,
 
   logConfig: {
     logFolder: './/logs//',
